@@ -1,6 +1,8 @@
 package com.example.secondspringapp;
 
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -15,7 +17,11 @@ import java.util.stream.Collectors;
 @Service
 public class FileService {
 
-    private final String fileName = "data.csv";
+    private final String fileName;
+
+    public FileService(@Value("${app.file.source}") String fileName) {
+        this.fileName = fileName;
+    }
 
     List<Entry> readAllFile() throws IOException {
         return Files.readAllLines(Paths.get(fileName))
