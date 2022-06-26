@@ -1,6 +1,7 @@
 package com.example.secondspringapp;
 
 
+import com.example.secondspringapp.crypto.CipherService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
@@ -15,17 +16,20 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class FileService {
+class FileService {
 
     private final String fileName;
+    private final CipherService cipherService;
 
-    public FileService(@Value("${app.file.source}") String fileName) {
+    public FileService(@Value("${app.filename}") String fileName, CipherService cipherService) {
         this.fileName = fileName;
+        this.cipherService = cipherService;
     }
 
     List<Entry> readAllFile() throws IOException {
         return Files.readAllLines(Paths.get(fileName))
                 .stream()
+                .map(cipherService::decrypt)
                 .map(CsvEntryConverter::parse)
                 .collect(Collectors.toList());
     }
@@ -33,7 +37,7 @@ public class FileService {
     void saveEntries(List<Entry> entries) throws IOException{
         BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));
         for (Entry entry : entries) {
-            writer.write(entry.toString());
+            writer.write(cipherService.encrypt(entry.toString()));
             writer.newLine();
         }
         writer.close();

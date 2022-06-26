@@ -1,3 +1,7 @@
 app:
-  file:
-    source: data.csv
+  filename: data.csv
+spring:
+  banner:
+    location: logo-app.txt
+  profiles:
+    active: prod
